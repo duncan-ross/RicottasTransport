@@ -4,7 +4,7 @@ import sys
 import csv
 import spacy
 
-def main():
+def start(text):
 	chat_history = {}
 	with open('data.json', 'r') as f:
 		chat_history = json.load(f)
@@ -14,8 +14,10 @@ def main():
 			learnChat(chat_history)
 		else:
 			runChat(chat_history)
-		'''
+		
 		learnMovies(chat_history)
+		'''
+		print (response(chat_history, text))
 		closeFile(chat_history)
 		
 def learnMovies(chat_history):
@@ -62,9 +64,9 @@ def response(chat_history, text):
 			if doc1.similarity(doc2) > .7:
 				return selectRandom(chat_history, i)
 		print ("Sorry I do not know that! :(")
-		response = input("How should I respond: ")
-		chat_history[text] = [(response, 1)]
-		return response
+		# response = input("How should I respond: ")
+		# chat_history[text] = [(response, 1)]
+		return ""#response
 
 def selectRandom(chat_history, text):
 	nodes = chat_history[text]
@@ -90,5 +92,3 @@ def learn(chat_history, text, response):
 			nodes.append((response, 1.0))
 	else:
 		chat_history[text] = [(response, 1.0)]
-
-main()

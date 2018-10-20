@@ -125,16 +125,16 @@ def listen_print_loop(responses):
 
         else:
             print(transcript + overwrite_chars)
-
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
-            if re.search(r'\b(exit|quit)\b', transcript, re.I):
-                print('Exiting..')
-                break
+            # if re.search(r'\b(exit|quit)\b', transcript, re.I):
+            #     print('Exiting..')
+            #     break
+            return transcript
 
             num_chars_printed = 0
-
-
+    return ""
+    
 def main():
     # See http://g.co/cloud/speech/docs/languages
     # for a list of supported languages.
@@ -157,8 +157,8 @@ def main():
         responses = client.streaming_recognize(streaming_config, requests)
 
         # Now, put the transcription responses to use.
-        listen_print_loop(responses)
-        start(responses)
+        transcript = listen_print_loop(responses)
+        start(transcript)
 
 
 if __name__ == '__main__':
