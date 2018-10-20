@@ -8,6 +8,7 @@ from google.cloud.speech import enums
 from google.cloud.speech import types
 import pyaudio
 from six.moves import queue
+from chatbot import start
 
 # Audio recording parameters
 RATE = 16000
@@ -157,6 +158,7 @@ def main():
 
         # Now, put the transcription responses to use.
         listen_print_loop(responses)
+        start(responses)
 
 
 if __name__ == '__main__':
