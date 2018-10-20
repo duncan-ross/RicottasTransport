@@ -40,3 +40,6 @@ def learn(text, response):
 	else:
 		chat_history[text] = [(response, 1.0)]
 
+main()
+
+end()
