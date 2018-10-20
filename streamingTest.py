@@ -124,7 +124,7 @@ def listen_print_loop(responses):
             num_chars_printed = len(transcript)
 
         else:
-            print(transcript + overwrite_chars)
+            print("User:", transcript + overwrite_chars)
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
             # if re.search(r'\b(exit|quit)\b', transcript, re.I):
@@ -150,15 +150,16 @@ def main():
         interim_results=True)
 
     with MicrophoneStream(RATE, CHUNK) as stream:
-        audio_generator = stream.generator()
-        requests = (types.StreamingRecognizeRequest(audio_content=content)
-                    for content in audio_generator)
+        while (True):
+            audio_generator = stream.generator()
+            requests = (types.StreamingRecognizeRequest(audio_content=content)
+                        for content in audio_generator)
 
-        responses = client.streaming_recognize(streaming_config, requests)
+            responses = client.streaming_recognize(streaming_config, requests)
 
-        # Now, put the transcription responses to use.
-        transcript = listen_print_loop(responses)
-        start(transcript)
+            # Now, put the transcription responses to use.
+            transcript = listen_print_loop(responses)
+            start(transcript)
 
 
 if __name__ == '__main__':

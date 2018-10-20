@@ -13,25 +13,18 @@ def start(text):
 	chat_history = {}
 	with open('data.json', 'r') as f:
 		chat_history = json.load(f)
-		
-		shouldLearn = input("Learn or Chat: ")
-		if ( shouldLearn == "learn"):
-			learnChatterbot(chat_history)
-			learnMovies(chat_history, "movie_lines.tsv")
-			learnMovies(chat_history, "movie_lines 2.tsv")
-		else:
-			runChat(chat_history)
-<<<<<<< HEAD
-		
-		learnMovies(chat_history)
-		'''
-		print (response(chat_history, text))
-		closeFile(chat_history)
-=======
->>>>>>> 292f5d3d49c44bc01a5dee861ebfa974c4e2026d
+		talk = response(chat_history, text.strip().lower())
+		print("Ricottas:", talk)
+		os.system("say " + talk)		# shouldLearn = input("Learn or Chat: ")
+		# if ( shouldLearn == "learn"):
+		# 	learnChatterbot(chat_history)
+		# 	learnMovies(chat_history, "movie_lines.tsv")
+		# 	learnMovies(chat_history, "movie_lines 2.tsv")
+		# else:
+		# 	runChat(chat_history)
 		
 		#learnChatterbot(chat_history)
-		closeFile(chat_history)
+		#closeFile(chat_history)
 	
 def learnChatterbot(chat_history):
 	path = '/Users/OsmarCoronel/Desktop/UIUC/Junior/Fall/HackGT' 
