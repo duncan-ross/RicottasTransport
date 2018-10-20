@@ -3,23 +3,43 @@ import json
 import sys
 import csv
 import spacy
+import os
+import glob
+import string
+
+table = str.maketrans({key: None for key in string.punctuation})
 
 def main():
 	chat_history = {}
 	with open('data.json', 'r') as f:
 		chat_history = json.load(f)
-		'''
+		
 		shouldLearn = input("Learn or Chat: ")
 		if ( shouldLearn == "learn"):
-			learnChat(chat_history)
+			learnChatterbot(chat_history)
+			learnMovies(chat_history, "movie_lines.tsv")
+			learnMovies(chat_history, "movie_lines 2.tsv")
 		else:
 			runChat(chat_history)
-		'''
-		learnMovies(chat_history)
-		closeFile(chat_history)
 		
-def learnMovies(chat_history):
-	with open('movie_lines 2.tsv', 'r') as f:
+		#learnChatterbot(chat_history)
+		closeFile(chat_history)
+	
+def learnChatterbot(chat_history):
+	path = '/Users/OsmarCoronel/Desktop/UIUC/Junior/Fall/HackGT' 
+	for filename in glob.glob(os.path.join(path, '*.data')):
+		with open(filename, 'r') as f:
+			spamreader = csv.reader(f, delimiter=':')
+			previous = None
+			for row in spamreader:
+				if previous is None:
+					previous = row[1]
+				else:
+					learn(chat_history, previous, row[1])
+					previous = row[1]
+	
+def learnMovies(chat_history, movie_name):
+	with open(movie_name, 'r') as f:
 		tsvin = csv.reader(f, delimiter='\t')
 		convoNum = None
 		previous = None
@@ -37,7 +57,9 @@ def learnMovies(chat_history):
 def runChat(chat_history):
 	line = input("User: ")
 	while line != "quit":
-		print ("Ricottas:", response(chat_history, line.strip().lower()))
+		talk = response(chat_history, line.strip().lower())
+		print("Ricottas:", talk)
+		os.system("say " + talk)
 		line = input("User: ")
 
 def learnChat(chat_history):
@@ -52,6 +74,7 @@ def closeFile(chat_history):
 		json.dump(chat_history, f)
 
 def response(chat_history, text):
+	text = text.translate(table)
 	nlp = spacy.load('en')
 	if text in chat_history:
 		return selectRandom(chat_history, text)
@@ -79,6 +102,8 @@ def selectRandom(chat_history, text):
 	return ""
 
 def learn(chat_history, text, response):
+	text = text.translate(table)
+	response = response.translate(table)
 	if text in chat_history:
 		nodes = chat_history[text]
 		for i in range(len(nodes)):
