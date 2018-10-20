@@ -80,10 +80,10 @@ def response(chat_history, text):
 	if text in chat_history:
 		return selectRandom(chat_history, text)
 	else:
+		doc2 = nlp(text)
 		for i in chat_history.keys():
 			doc1 = nlp(i)
-			doc2 = nlp(text)
-			if doc1.similarity(doc2) > .7:
+			if doc2.similarity(doc1) > .7:
 				return selectRandom(chat_history, i)
 		print ("Sorry I do not know that! :(")
 		# response = input("How should I respond: ")
