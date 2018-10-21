@@ -11,13 +11,13 @@ import re
 table = str.maketrans({key: None for key in string.punctuation})
 data_file_name = 'data.json'
 
-def start(text):
+def start(text, response):
 	chat_history = {}
 	with open(data_file_name, 'r') as f:
 		chat_history = json.load(f)
-		talk = response(chat_history, text.strip().lower())
-		print("Ricottas:", talk)
-		os.system("say " + talk)
+		# talk = response(chat_history, text.strip().lower())
+		# print("Ricottas:", talk)
+		# os.system("say " + talk)
 		# shouldLearn = input("Learn or Chat: ")
 		# if ( shouldLearn == "learn"):
 		# 	learnChatterbot(chat_history)
@@ -29,7 +29,8 @@ def start(text):
 		#learnChatterbot(chat_history)
 		# learnQuestionAnswer(chat_history)
 		# learnJeopardy(chat_history)
-		# closeFile(chat_history)
+		learn(chat_history, text, response)
+		closeFile(chat_history)
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
@@ -105,20 +106,22 @@ def closeFile(chat_history):
 		json.dump(chat_history, f)
 
 def response(chat_history, text):
-	text = text.translate(table)
+	text = text.strip().lower().translate(table)
 	nlp = spacy.load('en')
 	if text in chat_history:
 		return selectRandom(chat_history, text)
 	else:
+		keys = list(chat_history.keys())
+		random.shuffle(keys)
 		doc2 = nlp(text)
-		for i in chat_history.keys():
-			doc1 = nlp(i)
-			if doc2.similarity(doc1) > .8:
-				return selectRandom(chat_history, i)
-		print ("Sorry I do not know that! :(")
+		for i in range(min(len(keys), 2000)):
+			doc1 = nlp(keys[i])
+			if doc1.similarity(doc2) > .8:
+				return selectRandom(chat_history, keys[i])
+		# print ("")
 		# response = input("How should I respond: ")
 		# chat_history[text] = [(response, 1)]
-		return ""#response
+		return "Sorry I do not know that!"
 
 def selectRandom(chat_history, text):
 	nodes = chat_history[text]
@@ -133,8 +136,8 @@ def selectRandom(chat_history, text):
 	return ""
 
 def learn(chat_history, text, response):
-	text = text.translate(table)
-	response = response.translate(table)
+	text = text.strip().lower().translate(table)
+	response = response.strip().lower().replace('"', '').replace("'", "")
 	if text in chat_history:
 		nodes = chat_history[text]
 		for i in range(len(nodes)):

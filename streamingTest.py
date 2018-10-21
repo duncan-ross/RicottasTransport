@@ -149,6 +149,7 @@ def main():
         config=config,
         interim_results=True)
 
+    previous = None
     with MicrophoneStream(RATE, CHUNK) as stream:
         while (True):
             audio_generator = stream.generator()
@@ -159,7 +160,9 @@ def main():
 
             # Now, put the transcription responses to use.
             transcript = listen_print_loop(responses)
-            start(transcript)
+            if previous is not None: 
+                start(previous, transcript)
+            previous = transcript
 
 
 if __name__ == '__main__':
