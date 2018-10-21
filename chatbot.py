@@ -6,6 +6,7 @@ import spacy
 import os
 import glob
 import string
+import re
 
 table = str.maketrans({key: None for key in string.punctuation})
 data_file_name = 'data.json'
@@ -27,7 +28,14 @@ def start(text):
 		
 		#learnChatterbot(chat_history)
 		# learnQuestionAnswer(chat_history)
+		# learnJeopardy(chat_history)
 		# closeFile(chat_history)
+
+def cleanhtml(raw_html):
+  cleanr = re.compile('<.*?>')
+  cleantext = re.sub(cleanr, '', raw_html)
+  return cleantext
+
 def learnQuestionAnswer(chat_history):
 	path = '/Users/duncanross/Downloads/stanford-question-answering-dataset/'
 	for filename in glob.glob(os.path.join(path, '*.json')):
@@ -39,7 +47,14 @@ def learnQuestionAnswer(chat_history):
 						for answer in qa["answers"]:
 							learn(chat_history, qa["question"].strip().lower(), answer["text"].strip().lower())
 
-
+def learnJeopardy(chat_history):
+	path = '/Users/duncanross/Downloads/Jeopardy'
+	for filename in glob.glob(os.path.join(path, '*.json')):
+		with open(filename, 'r') as f:
+			data = json.load(f)
+			for element in data:
+				clean = cleanhtml(element["question"])
+				learn(chat_history, clean.strip().lower(), element["answer"].strip().lower())
 	
 def learnChatterbot(chat_history):
 	path = '/Users/OsmarCoronel/Desktop/UIUC/Junior/Fall/HackGT' 
@@ -131,5 +146,3 @@ def learn(chat_history, text, response):
 			nodes.append((response, 1.0))
 	else:
 		chat_history[text] = [(response, 1.0)]
-
-start("")
