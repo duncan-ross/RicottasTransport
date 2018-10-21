@@ -8,23 +8,38 @@ import glob
 import string
 
 table = str.maketrans({key: None for key in string.punctuation})
+data_file_name = 'data.json'
 
 def start(text):
 	chat_history = {}
-	with open('data.json', 'r') as f:
+	with open(data_file_name, 'r') as f:
 		chat_history = json.load(f)
 		talk = response(chat_history, text.strip().lower())
 		print("Ricottas:", talk)
-		os.system("say " + talk)		# shouldLearn = input("Learn or Chat: ")
+		os.system("say " + talk)
+		# shouldLearn = input("Learn or Chat: ")
 		# if ( shouldLearn == "learn"):
 		# 	learnChatterbot(chat_history)
 		# 	learnMovies(chat_history, "movie_lines.tsv")
 		# 	learnMovies(chat_history, "movie_lines 2.tsv")
 		# else:
-		# 	runChat(chat_history)
+			# runChat(chat_history)
 		
 		#learnChatterbot(chat_history)
-		#closeFile(chat_history)
+		# learnQuestionAnswer(chat_history)
+		# closeFile(chat_history)
+def learnQuestionAnswer(chat_history):
+	path = '/Users/duncanross/Downloads/stanford-question-answering-dataset/'
+	for filename in glob.glob(os.path.join(path, '*.json')):
+		with open(filename, 'r') as f:
+			data = json.load(f)
+			for element in data["data"]:
+				for paragraph in element["paragraphs"]:
+					for qa in paragraph["qas"]:
+						for answer in qa["answers"]:
+							learn(chat_history, qa["question"].strip().lower(), answer["text"].strip().lower())
+
+
 	
 def learnChatterbot(chat_history):
 	path = '/Users/OsmarCoronel/Desktop/UIUC/Junior/Fall/HackGT' 
@@ -71,7 +86,7 @@ def learnChat(chat_history):
 		learn(chat_history, text, response)
 
 def closeFile(chat_history):
-	with open('data.json', 'w') as f:	
+	with open(data_file_name, 'w') as f:	
 		json.dump(chat_history, f)
 
 def response(chat_history, text):
@@ -83,7 +98,7 @@ def response(chat_history, text):
 		doc2 = nlp(text)
 		for i in chat_history.keys():
 			doc1 = nlp(i)
-			if doc2.similarity(doc1) > .7:
+			if doc2.similarity(doc1) > .8:
 				return selectRandom(chat_history, i)
 		print ("Sorry I do not know that! :(")
 		# response = input("How should I respond: ")
@@ -116,3 +131,5 @@ def learn(chat_history, text, response):
 			nodes.append((response, 1.0))
 	else:
 		chat_history[text] = [(response, 1.0)]
+
+start("")
