@@ -74,17 +74,18 @@ def closeFile(chat_history):
 		json.dump(chat_history, f)
 
 def response(chat_history, text):
-	text = text.translate(table)
+	text = text.strip().lower().translate(table)
 	nlp = spacy.load('en')
 	if text in chat_history:
 		return selectRandom(chat_history, text)
 	else:
-		for i in chat_history.keys():
-			doc1 = nlp(i)
+		keys = list(chat_history.keys())
+		for i in range(min(len(keys), 500)):
+			doc1 = nlp(keys[i])
 			doc2 = nlp(text)
 			if doc1.similarity(doc2) > .7:
-				return selectRandom(chat_history, i)
-		print ("Sorry I do not know that! :(")
+				return selectRandom(chat_history, keys[i])
+		print ("Sorry I do not know that!")
 		response = input("How should I respond: ")
 		chat_history[text] = [(response, 1)]
 		return response
@@ -102,8 +103,8 @@ def selectRandom(chat_history, text):
 	return ""
 
 def learn(chat_history, text, response):
-	text = text.translate(table)
-	response = response.translate(table)
+	text = text.strip().lower().translate(table)
+	response = response.strip().lower().replace('"', '').replace("'", "")
 	if text in chat_history:
 		nodes = chat_history[text]
 		for i in range(len(nodes)):
